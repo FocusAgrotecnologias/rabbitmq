@@ -1,0 +1,27 @@
+networks:
+  kong-net:
+    name: kong-net
+    driver: bridge
+    external: true
+
+services:
+  rabbit:
+    build:
+      context: ./rabbitmq
+      dockerfile: Dockerfile
+    restart: always
+    container_name: rabbit
+    hostname: rabbitmq
+    volumes:
+      - "./data/rabbit:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15673"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+    image: rabbitmq
+    networks:
+      - kong-net
